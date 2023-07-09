@@ -35,6 +35,16 @@ repos:
           - id: name-tests-test # verifies Python test files are named correctly - i.e., ensure py tests match .*_test\.py
 
   ######################################################################################################################
+  # CICD linters
+  ######################################################################################################################
+    - repo: https://github.com/python-jsonschema/check-jsonschema
+      rev: 0.23.2
+      hooks:
+          - id: check-github-actions # github-actions
+          - id: check-gitlab-ci # gitlab-ci
+          - id: check-azure-pipelines # azure-pipelines
+
+  ######################################################################################################################
   # Technology-specific linters
   ######################################################################################################################
   # SQLFluff - linter for SQL
