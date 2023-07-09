@@ -21,7 +21,7 @@ repos:
           - id: trailing-whitespace # trims trailing whitespace.
       # Git hooks
           - id: no-commit-to-branch # prevents users from pushing changes to specific (protected) branches
-            args: [--branch, master, --pattern, release/.*]
+            args: [--branch, main, --pattern, release/.*]
           - id: check-merge-conflict # checks for files that contain merge conflict strings.
       # JSON hooks
           - id: check-json # checks json files for parseable syntax.
@@ -37,11 +37,6 @@ repos:
   ######################################################################################################################
   # Technology-specific linters
   ######################################################################################################################
-  # Dockerfile linter
-    - repo: https://github.com/Lucas-C/pre-commit-hooks-nodejs
-      rev: v1.1.2
-      hooks:
-          - id: dockerfile_lint
   # SQLFluff - linter for SQL
     - repo: https://github.com/sqlfluff/sqlfluff
       rev: 2.0.2
@@ -51,12 +46,7 @@ repos:
             # in dbt v1.4 there is a breaking change that causes the package 'sqlfluff-templater-dbt' to fail
             additional_dependencies: [dbt-core==1.3, dbt-snowflake==1.3, sqlfluff-templater-dbt==2.0.2]
 
-  # Dockerfile linter
-    #- repo: https://github.com/Lucas-C/pre-commit-hooks-nodejs
-    #  rev: v1.1.2
-    #  hooks:
-    #      - id: dockerfile_lint
-
+    # Dockerfile linter
     - repo: https://github.com/hadolint/hadolint
       rev: v2.12.0
       hooks:
@@ -71,12 +61,12 @@ repos:
   #       args: ["--manifest", "example_generated_dbt_project/target/manifest.json", "--tests", "unique=1", "not_null=1", "--"]
   #     - id: check-source-table-has-description
 
-  # Shell script hooks
+    # Shell script hooks
     - repo: https://github.com/jumanjihouse/pre-commit-hooks
       rev: 3.0.0
       hooks:
           - id: shellcheck # Ensure shell scripts conform to shellcheck
-          # - id: shfmt # Check shell style with shfmt - TODO: troubleshoot
+
   ######################################################################################################################
   # YAML hooks
   ######################################################################################################################
