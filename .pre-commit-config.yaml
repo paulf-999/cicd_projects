@@ -127,16 +127,3 @@ repos:
       hooks:
           - id: interrogate # checks your code base for missing docstrings.
             args: [--quiet, --fail-under=90]
-
-  ######################################################################################################################
-  # My custom Git branch validation hook
-  ######################################################################################################################
-  # TODO: troubleshoot execution for both Mac & Windows
-    - repo: local
-      hooks:
-          - id: git_branch_name_validation
-            name: Git branch name validation
-            description: This hook validates the Git branch name.
-            entry: src/sh/validate_git_branch_name.sh
-            language: script
-            pass_filenames: false
