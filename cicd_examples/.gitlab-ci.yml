@@ -5,16 +5,13 @@ variables:
     IMAGE_TAG: $CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA
     DOCKER_REGISTRY: registry.example.com # TODO: update value
     DOCKER_IMAGE: $DOCKER_REGISTRY/$APP_NAME:$IMAGE_TAG # TODO: update value
-    tags:
-        - foundations
-        - docker
-    before_script:
-        - unset AWS_ACCESS_KEY_ID
-        - unset AWS_SECRET_ACCESS_KEY
-        - cat /etc/*release
-        - export ARTIFACTORY_REPO="wes-aac-docker-preprod"
-        - if echo "$CI_COMMIT_REF_NAME" | grep -q "^release"; then export ARTIFACTORY_REPO="wes-aac-docker-prod"; fi
-        - if [ $CI_COMMIT_REF_NAME = "main" ]; then export ARTIFACTORY_REPO="wes-aac-docker-prod"; fi
+before_script:
+    - unset AWS_ACCESS_KEY_ID
+    - unset AWS_SECRET_ACCESS_KEY
+    - cat /etc/*release
+    - export ARTIFACTORY_REPO="wes-aac-docker-preprod"
+    - if echo "$CI_COMMIT_REF_NAME" | grep -q "^release"; then export ARTIFACTORY_REPO="wes-aac-docker-prod"; fi
+    - if [ $CI_COMMIT_REF_NAME = "main" ]; then export ARTIFACTORY_REPO="wes-aac-docker-prod"; fi
 
 # Define stages
 stages:

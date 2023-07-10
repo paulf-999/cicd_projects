@@ -20,6 +20,7 @@ __pycache__/
 # Distribution / packaging
 dist/
 downloads/
+builds/
 
 # Unit test / coverage reports
 .pytest_cache/
