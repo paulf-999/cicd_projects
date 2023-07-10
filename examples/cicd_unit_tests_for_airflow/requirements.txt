@@ -1,0 +1,5 @@
+cryptography==35.0.0 # used for generating a p8 pem key
+humanfriendly # used for generating date/time strings in a nice format
+pyarrow
+pytest # used for carrying out the unit tests!
+snowflake-connector-python # for connectivity to snowflake
