@@ -43,7 +43,7 @@ repos:
           - id: check-github-actions # github-actions
           - id: check-github-workflows # github workflows
           - id: check-gitlab-ci # gitlab-ci
-          - id: check-azure-pipelines # azure-pipelines
+          # - id: check-azure-pipelines # azure-pipelines - this is currently error'ing
 
   ######################################################################################################################
   # Technology-specific linters
