@@ -6,34 +6,47 @@ variables:
 trigger:
     branches:
         include:
-            - main
+            - main # Replace with the branch you want to trigger the pipeline
     paths:
         exclude:
             - README.md
 
 # only trigger the CI job on PR (pull request) to the master branch
-pr:
-    branches:
-        include:
-            - '*'
+# pr:
+#     branches:
+#         include:
+#             - '*'
 
 pool:
     vmImage: ubuntu-latest
 
 steps:
-    - script: echo 'Starting pipeline...'
-      displayName: Starting Pipeline
+    - script: |
+          python --version
+      displayName: Check Python version
 
-    - task: NodeTool@0
+    - task: UsePythonVersion@0
       inputs:
-          versionSpec: 14.x
-          displayName: Install Node.js
+          versionSpec: 3.x # Replace with the desired Python version
+          addToPath: true
 
-    - script: npm install
-      displayName: Install Dependencies
+    - task: PythonScript@0
+      inputs:
+          scriptSource: filePath
+          scriptPath: path/to/your/script.py # Replace with the path to your Python script
+          pythonInterpreter: python # Replace with the desired Python interpreter
 
-    - script: npm run build
-      displayName: Build Application
+    - task: ShellScript@2
+      inputs:
+          scriptPath: path/to/your/script.sh # Replace with the path to your shell script
 
-    - script: npm test
-      displayName: Run Tests
+    - task: PublishPipelineArtifact@1
+      inputs:
+          targetPath: $(Build.ArtifactStagingDirectory)
+          artifactName: output
+          publishLocation: pipeline
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+          artifactName: output
+          pathToPublish: $(Build.ArtifactStagingDirectory)
