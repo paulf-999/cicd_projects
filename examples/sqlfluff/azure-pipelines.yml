@@ -1,0 +1,87 @@
+---
+variables:
+
+    # the source branch from the Git PR (pull request)
+    SOURCE_GIT_BRANCH_NAME: $[replace(variables['System.PullRequest.SourceBranch'], 'refs/heads/', '')]
+
+    # filepath to where the CICD files are stored within the git repo
+    CICD_FILES_DIR: src/cicd/sqlfluff
+    # dbt variables
+    DBT_PROJECT_DIR: example
+    DBT_PROFILE_DIR: profiles
+    DBT_PROD_RUN_ARTIFACTS_DIR: dbt_prod_run_artifacts
+    # Azure Key Vault name
+    AZURE_KEY_VAULT_NAME: <TODO>
+
+# only trigger the CI job on PR (pull request) to the master branch
+pr:
+    branches:
+        include:
+            - feature/cicd_sqlfluff_dev
+            # - master
+
+pool: <TODO_AZ_AGENT>
+
+jobs:
+    #======================================================================================================================================
+    # Job 1: SQLFluff lint the amended dbt models
+    #======================================================================================================================================
+    - job: SQLFluff
+      displayName: SQLFluff lint
+      steps:
+          #======================================================================================================================================
+          # Note: the first 5 scripts below (i.e., before 'Step 1' are to be removed once the AZ agent upgrade has been made.
+          # We need to upgrade the version of dbt used, as the current version installed has package dep issues
+          #======================================================================================================================================
+          - script: rm -rf /usr/local/lib/python3.8/dist-packages/OpenSSL && rm -rf /usr/local/lib/python3.8/dist-packages/pyOpenSSL-22.1.0.dist-info/
+            displayName: Prep step/too be removed - Remove the OpenSSL package files (it's causing issues)
+          - script: pip install --upgrade pyOpenSSL
+            displayName: Prep step/too be removed - Upgrade pyOpenSSL
+          - script: pip install -r $(CICD_FILES_DIR)/requirements.txt
+            displayName: Prep step/to be removed - pip install requirements.txt
+          - script: pip list
+            displayName: DELETE - pip list
+            # TODO remove pip list above & dbt check below
+          - script: dbt --version
+            displayName: DELETE - To soon be removed - check dbt version
+          - script: sqlfluff --version
+            displayName: DELETE - To soon be removed - check sqlfluff version
+          #######################################################################################################################################
+          # Step 1: Connect to Azure Key Vault (KV) and fetch the Vault secrets we're interested in
+          #######################################################################################################################################
+          #<TODO>
+          #######################################################################################################################################
+          # Step 2: Generate a timestamp var ($$DATETIME_TS) to use as a unique schema name
+          #######################################################################################################################################
+          - script: |
+                echo && echo "Generate a datetime timestamp var - this is then used in the dbt profile render step (below)" && echo
+                date=$(date +%Y%m%d_%H%M%S)
+                echo "##vso[task.setvariable variable=DATETIME_TS;]$date"
+            displayName: Generate timestamp var (i.e., $DATETIME_TS) for dynamic schema name
+          #######################################################################################################################################
+          # Step 3: Using the above KV secrets, let's render the dbt profiles.yml file
+          #######################################################################################################################################
+          - script: |
+                echo && echo "##[section]Step 1: Render the dbt profiles.yml template."
+                echo "##[debug]Command = j2 src/templates/profiles.yml.j2 -o prod_analytics/profiles/profiles.yml"
+                j2 src/templates/profiles.yml.j2 -o prod_analytics/profiles/profiles.yml
+                echo "##[section]Step 2: Print out the (masked) contents of the generated profiles.yml file" && echo
+                cat prod_analytics/profiles/profiles.yml && echo
+            env:
+                SNOWFLAKE_ACCOUNT_NAME: $(SNOWFLAKE-ACCOUNT-NAME)
+                SNOWFLAKE_ROLE: $(SNOWFLAKE-ROLE)
+                SNOWFLAKE_DBT_USERNAME: $(SNOWFLAKE-DBT-USERNAME)
+                SNOWFLAKE_DATABASE: $(SNOWFLAKE-DATABASE)
+                DATETIME_STRING: $(DATETIME_TS) # Created in the above step "Timestamp VAR Creation (i.e., $DATETIME_TS)"
+                SNOWFLAKE_SCHEMA_PREFIX: $(SNOWFLAKE-SCHEMA-PREFIX)
+            displayName: Render dbt profiles.yml
+          #######################################################################################################################################
+          # Step 4: Let's now attempt to use the SQLFluff command
+          #######################################################################################################################################
+          - script: |
+                echo && echo "##[section]Test the quality of the SQL within the new/modified dbt model(s)."
+                echo "##[debug]Command = diff-quality --violations sqlfluff --compare-branch origin/master --fail-under 100"
+                diff-quality --violations sqlfluff --compare-branch origin/master --fail-under 100
+            displayName: SQLFluff lint the modified dbt models
+            env:
+                SNOWFLAKE_DBT_PASSWORD: $(SNOWFLAKE-DBT-PASSWORD)
