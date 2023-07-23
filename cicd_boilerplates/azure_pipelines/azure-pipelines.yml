@@ -21,6 +21,30 @@ pool:
     vmImage: ubuntu-latest
 
 steps:
+    #---------------------------------------------------------------------------------
+    # Shell script examples
+    #---------------------------------------------------------------------------------
+    - script: |
+          python --version
+      displayName: Check Python version
+
+    - task: ShellScript@2
+      inputs:
+          scriptPath: path/to/your/script.sh # Replace with the path to your shell script
+      displayName: Shell script example
+
+    #---------------------------------------------------------------------------------
+    # Debugging task
+    #---------------------------------------------------------------------------------
+    - task: Bash@3
+      inputs:
+          targetType: inline
+          script: env | sort
+      displayName: List all predefined AZ pipeline vars
+
+    #---------------------------------------------------------------------------------
+    # Python examples
+    #---------------------------------------------------------------------------------
     - script: |
           python --version
       displayName: Check Python version
@@ -36,10 +60,9 @@ steps:
           scriptPath: path/to/your/script.py # Replace with the path to your Python script
           pythonInterpreter: python # Replace with the desired Python interpreter
 
-    - task: ShellScript@2
-      inputs:
-          scriptPath: path/to/your/script.sh # Replace with the path to your shell script
-
+    #---------------------------------------------------------------------------------
+    # Copy/push logs
+    #---------------------------------------------------------------------------------
     - task: PublishPipelineArtifact@1
       inputs:
           targetPath: $(Build.ArtifactStagingDirectory)
