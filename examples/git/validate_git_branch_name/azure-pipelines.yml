@@ -1,0 +1,27 @@
+---
+variables:
+    # the source branch from the Git PR (pull request)
+    SOURCE_GIT_BRANCH_NAME: $[replace(variables['System.PullRequest.SourceBranch'], 'refs/heads/', '')]
+
+# only trigger the CI job on PR (pull request) to the master branch
+pr:
+    branches:
+        include:
+            - main
+
+pool:
+    vmImage: ubuntu-latest  # Choose the appropriate agent image
+
+jobs:
+    #=========================================================================================================================================
+    # Job 1: Validate the Git branch name
+    # Ensure the Git branch name follows the naming standard (i.e., uses underscores & not hyphens) - ^(feature|hotfix|release)\/[a-z0-9_]+$
+    #=========================================================================================================================================
+    - job: validateNumberOfFiles
+      displayName: Git validation - verify number of files in PR
+      steps:
+          - task: Bash@3
+            inputs:
+                filePath: src/cicd/git_validate_num_file_changes.sh
+                arguments: $(SOURCE_GIT_BRANCH_NAME)
+            displayName: Validate Git branch name
