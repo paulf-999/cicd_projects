@@ -1,10 +1,10 @@
 SHELL = /bin/sh
 
-# all: deps install [X, Y, Z...] clean
+
 
 .EXPORT_ALL_VARIABLES:
 
-.PHONY = installations deps install clean
+.PHONY: installations deps install clean
 
 CICD_job_name := name_of_cicd_job_here
 
